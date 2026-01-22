@@ -26,7 +26,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          submodules: recursive  # <--- ESTO ES LO QUE FALTA
+          submodules: recursive  # <--- VITAL: Mantenemos esto
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -40,26 +41,34 @@ jobs:
           target: x86_64-pc-windows-msvc
           override: true
 
-      # --- PASO ELIMINADO: VCPKG MANUAL ---
-      # No instalamos dependencias manualmente. 
-      # El script build.py leerá vcpkg.json automáticamente.
+      # --- CORRECCIÓN 1: Instalar LLVM (Necesario para bindgen) ---
+      - name: Instalar LLVM y Clang
+        run: choco install llvm -y
+        shell: cmd
+
+      # --- CORRECCIÓN 2: Instalar Dependencias (Modo Manifiesto) ---
+      # Ejecutamos vcpkg sin argumentos para que lea vcpkg.json
+      - name: Instalar Dependencias Vcpkg
+        run: vcpkg install
+        shell: cmd
 
       - name: Build RustDesk (Release)
         env:
           RENDEZVOUS_SERVER: ${{ secrets.RENDEZVOUS_SERVER }}
           RS_PUB_KEY: ${{ secrets.RS_PUB_KEY }}
-        # El flag --hwcodec descarga las librerías necesarias automáticamente
+          # --- CORRECCIÓN 3: Variables de Entorno para Clang ---
+          # Le decimos a Rust dónde encontrar la librería que acabamos de instalar
+          LIBCLANG_PATH: 'C:\Program Files\LLVM\bin'
+          LLVM_INSTALL_PATH: 'C:\Program Files\LLVM'
         run: python3 build.py --flutter --hwcodec
         shell: cmd
 
-      # --- EMPAQUETADO CON INNO SETUP ---
-      
+      # --- EMPAQUETADO ---
       - name: Instalar Inno Setup (Nativo)
         run: choco install innosetup --no-progress
         shell: cmd
 
       - name: Compilar Instalador .exe
-        # Asegúrate de que setup.iss busca "rustdesk.exe" y no "abasur.exe" en el origen
         run: |
           "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
         shell: cmd
