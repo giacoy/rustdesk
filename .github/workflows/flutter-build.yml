@@ -62,10 +62,6 @@ jobs:
         env:
           RENDEZVOUS_SERVER: ${{ secrets.RENDEZVOUS_SERVER }}
           RS_PUB_KEY: ${{ secrets.RS_PUB_KEY }}
-          # Rutas críticas para que Rust encuentre las herramientas
-          LIBCLANG_PATH: 'C:\Program Files\LLVM\bin'
-          LLVM_INSTALL_PATH: 'C:\Program Files\LLVM'
-          VCPKG_ROOT: 'C:\vcpkg'
         run: python3 build.py --flutter
         shell: cmd
 
