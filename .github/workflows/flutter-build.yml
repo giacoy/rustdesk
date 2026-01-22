@@ -1,7 +1,17 @@
 name: Build the flutter version of the RustDesk
 
 on:
-  workflow_call:
+  workflow_dispatch:   # <--- ESTO ACTIVA EL BOTÓN "RUN"
+    inputs:
+      upload-artifact:
+        type: boolean
+        default: true
+      upload-tag:
+        type: string
+        default: "nightly"
+  push:                # <--- ESTO LO ACTIVA AL GUARDAR
+    branches: [ "master" ]
+  workflow_call:       # <--- ESTO MANTIENE LA COMPATIBILIDAD
     inputs:
       upload-artifact:
         type: boolean
