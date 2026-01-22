@@ -12,5 +12,4 @@ DisableProgramGroupPage=yes
 UninstallDisplayIcon={app}\abasur.exe
 
 [Files]
-; INNO SETUP SE ENCARGA DE RENOMBRARLO AQUI:
 Source: "target\release\rustdesk.exe"; DestDir: "{app}"; DestName: "abasur.exe"
