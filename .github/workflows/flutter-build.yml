@@ -25,7 +25,8 @@ jobs:
     
     steps:
       - uses: actions/checkout@v3
-
+        with:
+          submodules: recursive  # <--- ESTO ES LO QUE FALTA
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
