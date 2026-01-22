@@ -1,5 +1,5 @@
 [package]
-name = "soporteabasur"
+name = "rustdesk"
 version = "1.4.5"
 authors = ["MANZO Soluciones Tecnológicas"]
 edition = "2021"
