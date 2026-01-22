@@ -45,7 +45,7 @@ jobs:
       - name: Instalar Herramientas de Compilación (LLVM, NASM, Perl)
         run: |
           choco install llvm -y
-          choco install nasm -y
+          choco install nasm --version 2.16.03 -y   # <--- ESTE ES EL CAMBIO
           choco install strawberryperl -y
         shell: cmd
 
