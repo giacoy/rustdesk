@@ -26,7 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          submodules: recursive  # <--- VITAL: Mantenemos esto
+          submodules: recursive
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -41,25 +41,30 @@ jobs:
           target: x86_64-pc-windows-msvc
           override: true
 
-      # --- CORRECCIÓN 1: Instalar LLVM (Necesario para bindgen) ---
-      - name: Instalar LLVM y Clang
-        run: choco install llvm -y
+      # --- CORRECCIÓN CRÍTICA: Instalar Herramientas Base ---
+      - name: Instalar LLVM y NASM (Vital para codecs)
+        run: |
+          choco install llvm -y
+          choco install nasm -y
         shell: cmd
 
-      # --- CORRECCIÓN 2: Instalar Dependencias (Modo Manifiesto) ---
-      # Ejecutamos vcpkg sin argumentos para que lea vcpkg.json
+      # --- CORRECCIÓN VCPKG: Integración y Limpieza ---
       - name: Instalar Dependencias Vcpkg
-        run: vcpkg install
+        env:
+          VCPKG_ROOT: 'C:\vcpkg'
+        run: |
+          vcpkg integrate install
+          vcpkg install
         shell: cmd
 
       - name: Build RustDesk (Release)
         env:
           RENDEZVOUS_SERVER: ${{ secrets.RENDEZVOUS_SERVER }}
           RS_PUB_KEY: ${{ secrets.RS_PUB_KEY }}
-          # --- CORRECCIÓN 3: Variables de Entorno para Clang ---
-          # Le decimos a Rust dónde encontrar la librería que acabamos de instalar
+          # Variables de entorno OBLIGATORIAS para que Rust encuentre lo instalado
           LIBCLANG_PATH: 'C:\Program Files\LLVM\bin'
           LLVM_INSTALL_PATH: 'C:\Program Files\LLVM'
+          VCPKG_ROOT: 'C:\vcpkg'
         run: python3 build.py --flutter --hwcodec
         shell: cmd
 
