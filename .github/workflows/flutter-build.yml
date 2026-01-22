@@ -62,8 +62,8 @@ jobs:
         env:
           RENDEZVOUS_SERVER: ${{ secrets.RENDEZVOUS_SERVER }}
           RS_PUB_KEY: ${{ secrets.RS_PUB_KEY }}
-        # Eliminamos --hwcodec para saltarnos el error de NASM/AOM
-        run: python3 build.py --flutter
+        # Forzamos a que NO use vcpkg y use solo lo necesario
+        run: python3 build.py --flutter --no-vcpkg
         shell: cmd
 
       # --- EMPAQUETADO ---
