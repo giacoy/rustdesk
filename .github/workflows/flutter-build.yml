@@ -41,14 +41,15 @@ jobs:
           target: x86_64-pc-windows-msvc
           override: true
 
-      # --- CORRECCIÓN CRÍTICA: Instalar Herramientas Base ---
-      - name: Instalar LLVM y NASM (Vital para codecs)
+      # --- CORRECCIÓN FINAL: NASM + PERL ---
+      - name: Instalar Herramientas de Compilación (LLVM, NASM, Perl)
         run: |
           choco install llvm -y
           choco install nasm -y
+          choco install strawberryperl -y
         shell: cmd
 
-      # --- CORRECCIÓN VCPKG: Integración y Limpieza ---
+      # --- VCPKG: Integración ---
       - name: Instalar Dependencias Vcpkg
         env:
           VCPKG_ROOT: 'C:\vcpkg'
@@ -61,7 +62,7 @@ jobs:
         env:
           RENDEZVOUS_SERVER: ${{ secrets.RENDEZVOUS_SERVER }}
           RS_PUB_KEY: ${{ secrets.RS_PUB_KEY }}
-          # Variables de entorno OBLIGATORIAS para que Rust encuentre lo instalado
+          # Rutas críticas para que Rust encuentre las herramientas
           LIBCLANG_PATH: 'C:\Program Files\LLVM\bin'
           LLVM_INSTALL_PATH: 'C:\Program Files\LLVM'
           VCPKG_ROOT: 'C:\vcpkg'
