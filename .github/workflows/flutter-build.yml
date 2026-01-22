@@ -39,32 +39,32 @@ jobs:
           target: x86_64-pc-windows-msvc
           override: true
 
-      - name: Install Vcpkg dependencies
-        run: |
-          vcpkg install libvpx:x64-windows libyuv:x64-windows opus:x64-windows aom:x64-windows
-        shell: cmd
+      # --- PASO ELIMINADO: VCPKG MANUAL ---
+      # No instalamos dependencias manualmente. 
+      # El script build.py leerá vcpkg.json automáticamente.
 
       - name: Build RustDesk (Release)
         env:
           RENDEZVOUS_SERVER: ${{ secrets.RENDEZVOUS_SERVER }}
           RS_PUB_KEY: ${{ secrets.RS_PUB_KEY }}
-        run: python3 build.py --flutter
+        # El flag --hwcodec descarga las librerías necesarias automáticamente
+        run: python3 build.py --flutter --hwcodec
         shell: cmd
 
-      # --- BLOQUE CORREGIDO: INSTALADOR ABASUR ---
+      # --- EMPAQUETADO CON INNO SETUP ---
       
       - name: Instalar Inno Setup (Nativo)
         run: choco install innosetup --no-progress
         shell: cmd
 
       - name: Compilar Instalador .exe
-        # Ejecutamos ISCC directamente sin acciones externas
+        # Asegúrate de que setup.iss busca "rustdesk.exe" y no "abasur.exe" en el origen
         run: |
           "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
         shell: cmd
 
       - name: Upload Installer Artifact
-        uses: actions/upload-artifact@v4  # Actualizado a v4 para evitar warnings
+        uses: actions/upload-artifact@v4
         with:
           name: Abasur-Instalador-Windows
           path: Output/Abasur_Instalador_Full.exe
