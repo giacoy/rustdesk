@@ -2,21 +2,8 @@ name: Build the flutter version of the RustDesk
 
 on:
   workflow_dispatch:
-    inputs:
-      upload-artifact:
-        type: boolean
-        description: 'Upload Artifacts'
-        default: true
   push:
     branches: [ "master" ]
-  workflow_call:
-    inputs:
-      upload-artifact:
-        type: boolean
-        default: true
-      upload-tag:
-        type: string
-        default: "nightly"
 
 jobs:
   build-windows:
@@ -41,38 +28,20 @@ jobs:
           target: x86_64-pc-windows-msvc
           override: true
 
-      # --- CORRECCIÓN FINAL: NASM + PERL ---
-      - name: Instalar Herramientas de Compilación (LLVM, NASM, Perl)
-        run: |
-          choco install llvm -y
-          choco install nasm --version 2.16.03 -y   # <--- ESTE ES EL CAMBIO
-          choco install strawberryperl -y
-        shell: cmd
-
-      # --- VCPKG: Integración ---
-      - name: Instalar Dependencias Vcpkg
-        env:
-          VCPKG_ROOT: 'C:\vcpkg'
-        run: |
-          vcpkg integrate install
-          vcpkg install
-        shell: cmd
+      # Eliminamos la instalación manual de NASM/Perl/LLVM porque --no-vcpkg no los necesita
+      # Eliminamos el paso "Instalar Dependencias Vcpkg" que es el que da error
 
       - name: Build RustDesk (Release)
         env:
           RENDEZVOUS_SERVER: ${{ secrets.RENDEZVOUS_SERVER }}
           RS_PUB_KEY: ${{ secrets.RS_PUB_KEY }}
-        # Forzamos a que NO use vcpkg y use solo lo necesario
+        # Al usar --no-vcpkg evitamos compilar las librerías de video que fallan
         run: python3 build.py --flutter --no-vcpkg
         shell: cmd
 
-      # --- EMPAQUETADO ---
-      - name: Instalar Inno Setup (Nativo)
-        run: choco install innosetup --no-progress
-        shell: cmd
-
-      - name: Compilar Instalador .exe
+      - name: Instalar Inno Setup y Compilar
         run: |
+          choco install innosetup --no-progress -y
           "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
         shell: cmd
 
