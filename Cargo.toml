@@ -1,10 +1,10 @@
 [package]
-name = "rustdesk"
+name = "soporteabasur"
 version = "1.4.5"
-authors = ["rustdesk <info@rustdesk.com>"]
+authors = ["MANZO Soluciones Tecnológicas"]
 edition = "2021"
 build= "build.rs"
-description = "RustDesk Remote Desktop"
+description = "Soporte remoto ABASUR"
 default-run = "rustdesk"
 rust-version = "1.75"
 
