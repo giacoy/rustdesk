@@ -28,15 +28,17 @@ jobs:
           target: x86_64-pc-windows-msvc
           override: true
 
-      # Eliminamos la instalación manual de NASM/Perl/LLVM porque --no-vcpkg no los necesita
-      # Eliminamos el paso "Instalar Dependencias Vcpkg" que es el que da error
+      # --- IMPORTANTE: Saltamos VCPKG totalmente ---
+      # No instalamos NASM, ni Perl, ni ejecutamos 'vcpkg install'.
+      # Esto evita que se intente compilar el códec 'aom' que da error.
 
       - name: Build RustDesk (Release)
         env:
           RENDEZVOUS_SERVER: ${{ secrets.RENDEZVOUS_SERVER }}
           RS_PUB_KEY: ${{ secrets.RS_PUB_KEY }}
-        # Al usar --no-vcpkg evitamos compilar las librerías de video que fallan
-        run: python3 build.py --flutter --no-vcpkg
+        # Usamos solo --flutter. El script detectará que no hay vcpkg preparado 
+        # y compilará lo esencial.
+        run: python3 build.py --flutter
         shell: cmd
 
       - name: Instalar Inno Setup y Compilar
