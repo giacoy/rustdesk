@@ -22,6 +22,7 @@ jobs:
   build-windows:
     name: Build Windows
     runs-on: windows-2022
+    
     steps:
       - uses: actions/checkout@v3
 
@@ -50,14 +51,20 @@ jobs:
         run: python3 build.py --flutter
         shell: cmd
 
-      # --- AQUÍ ESTÁ LA MAGIA DE ABASUR ---
-      - name: Compilar Instalador (Inno Setup)
-        uses: Minionguyjosh/inno-setup-action@v1.2.2
-        with:
-          path: setup.iss
+      # --- BLOQUE CORREGIDO: INSTALADOR ABASUR ---
+      
+      - name: Instalar Inno Setup (Nativo)
+        run: choco install innosetup --no-progress
+        shell: cmd
 
-      - name: Upload Installer
-        uses: actions/upload-artifact@v3
+      - name: Compilar Instalador .exe
+        # Ejecutamos ISCC directamente sin acciones externas
+        run: |
+          "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
+        shell: cmd
+
+      - name: Upload Installer Artifact
+        uses: actions/upload-artifact@v4  # Actualizado a v4 para evitar warnings
         with:
           name: Abasur-Instalador-Windows
-          path: Output/Abasur_Instalador.exe
+          path: Output/Abasur_Instalador_Full.exe
